@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flick E-Invoicing — Abu Dhabi Market Intelligence</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',Arial,sans-serif;background:#F3F2F1;color:#252423;font-size:13px}
+
+/* ── Header ── */
+.top-bar{background:linear-gradient(135deg,#1B3A6B,#2563a8);color:#fff;padding:14px 28px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 2px 8px rgba(0,0,0,.3)}
+.logo{font-size:20px;font-weight:700;letter-spacing:1px}.logo span{color:#D4A017}
+.subtitle{font-size:11px;opacity:.75;margin-top:2px}
+.badge{background:#D4A017;color:#1B3A6B;font-weight:700;font-size:11px;padding:5px 14px;border-radius:20px}
+
+/* ── Filter bar ── */
+.filter-bar{background:#fff;border-bottom:2px solid #E8E6E3;padding:8px 28px;display:flex;align-items:center;gap:14px}
+.filter-bar label{font-size:11px;color:#605E5C;font-weight:700}
+.filter-bar select{border:1px solid #C8C6C4;border-radius:4px;padding:4px 10px;font-size:11px;background:#FAFAFA;cursor:pointer}
+.filter-info{margin-left:auto;font-size:11px;color:#605E5C;font-weight:600}
+
+/* ── Canvas ── */
+.canvas{padding:16px 24px;display:grid;gap:14px}
+
+/* ── KPI ── */
+.kpi-row{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+.kpi{background:#fff;border-radius:6px;padding:14px 16px;border-top:4px solid #2563a8;box-shadow:0 1px 5px rgba(0,0,0,.08);position:relative;overflow:hidden}
+.kpi.red{border-top-color:#D13438}.kpi.gold{border-top-color:#D4A017}.kpi.green{border-top-color:#107C10}.kpi.orange{border-top-color:#E87722}
+.kpi-icon{position:absolute;right:12px;top:10px;font-size:24px;opacity:.12}
+.kpi-lbl{font-size:10px;color:#605E5C;font-weight:700;text-transform:uppercase;letter-spacing:.4px}
+.kpi-val{font-size:28px;font-weight:700;color:#252423;margin:4px 0 2px;line-height:1}
+.kpi.red .kpi-val{color:#D13438}.kpi.gold .kpi-val{color:#8A6800}.kpi.green .kpi-val{color:#107C10}.kpi.orange .kpi-val{color:#C45700}
+.kpi-sub{font-size:10px;color:#797775}
+.kpi-trend{font-size:10px;font-weight:600;margin-top:4px;color:#D13438}
+.kpi-trend.dn{color:#107C10}
+
+/* ── Cards ── */
+.card{background:#fff;border-radius:6px;box-shadow:0 1px 5px rgba(0,0,0,.08);overflow:hidden}
+.card-hdr{padding:10px 16px;border-bottom:1px solid #EDEBE9;display:flex;align-items:center;justify-content:space-between}
+.card-hdr h3{font-size:12px;font-weight:700;color:#252423}
+.card-hdr .sub{font-size:10px;color:#797775}
+.card-body{padding:12px 16px}
+
+/* ── Row layouts ── */
+.row2{display:grid;grid-template-columns:2fr 1fr 1fr;gap:14px}
+.row3{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.row4{display:grid;grid-template-columns:3fr 2fr;gap:14px}
+.col2{display:flex;flex-direction:column;gap:14px}
+
+/* ── CSS Bar Chart ── */
+.bar-chart{display:flex;flex-direction:column;gap:8px;padding:8px 0}
+.bar-row{display:flex;align-items:center;gap:8px}
+.bar-label{font-size:10px;color:#605E5C;width:130px;text-align:right;flex-shrink:0}
+.bar-track{flex:1;background:#F0EDEA;border-radius:4px;height:22px;position:relative;overflow:hidden}
+.bar-fill{height:100%;border-radius:4px;display:flex;align-items:center;padding-left:6px;font-size:10px;font-weight:700;color:#fff;transition:width .3s}
+.bar-val{font-size:11px;font-weight:700;min-width:24px;text-align:right}
+
+/* ── H-Bar Chart ── */
+.hbar-chart{display:flex;flex-direction:column;gap:7px;padding:6px 0}
+.hbar-row{display:flex;align-items:center;gap:8px}
+.hbar-label{font-size:10px;color:#605E5C;width:150px;flex-shrink:0}
+.hbar-track{flex:1;background:#F0EDEA;border-radius:4px;height:18px;overflow:hidden}
+.hbar-fill{height:100%;border-radius:4px;display:flex;align-items:center;padding:0 6px;font-size:10px;font-weight:700;color:#fff}
+.hbar-pct{font-size:10px;font-weight:700;min-width:30px;text-align:right}
+
+/* ── Donut ── */
+.donut-wrap{display:flex;flex-direction:column;align-items:center;gap:10px;padding:8px 0}
+.donut{width:150px;height:150px;border-radius:50%;position:relative}
+.donut-legend{display:flex;flex-wrap:wrap;gap:6px 14px;justify-content:center}
+.dl-item{display:flex;align-items:center;gap:5px;font-size:10px;color:#605E5C}
+.dl-dot{width:10px;height:10px;border-radius:2px;flex-shrink:0}
+
+/* ── Timeline ── */
+.timeline{display:flex;flex-direction:column;gap:0}
+.tl-item{display:flex;gap:12px;align-items:flex-start;padding:8px 0}
+.tl-dot{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;font-weight:700;color:#fff}
+.tl-phase{font-size:11px;font-weight:700;color:#252423}
+.tl-date{font-size:10px;color:#605E5C}
+.tl-desc{font-size:10px;color:#797775;margin-top:1px}
+.tl-connector{width:2px;height:12px;background:#E0DDD9;margin-left:15px}
+
+/* ── Sector table ── */
+.stbl{width:100%;border-collapse:collapse;font-size:11px}
+.stbl th{background:#1B3A6B;color:#fff;padding:7px 10px;text-align:left;font-size:10px;text-transform:uppercase;font-weight:700}
+.stbl td{padding:6px 10px;border-bottom:1px solid #EDEBE9;vertical-align:middle}
+.stbl tr:hover td{background:#F3F9FF}
+.stbl tr:last-child td{border-bottom:none}
+.mini-bar-wrap{display:flex;align-items:center;gap:5px}
+.mini-bar{height:8px;border-radius:4px;min-width:4px}
+
+/* ── Lead table ── */
+.ltbl{width:100%;border-collapse:collapse;font-size:11px}
+.ltbl th{background:#F3F2F1;color:#605E5C;padding:7px 10px;text-align:left;font-size:10px;text-transform:uppercase;font-weight:700;border-bottom:2px solid #E8E6E3}
+.ltbl td{padding:6px 10px;border-bottom:1px solid #EDEBE9}
+.ltbl tr:hover td{background:#F8F7F6}
+.pill{display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700}
+.pill.urgent{background:#FDE7E9;color:#D13438}
+.pill.high{background:#FFF0E0;color:#C45700}
+.pill.med{background:#FFF8DC;color:#8A6800}
+.pill.watch{background:#EFF6FF;color:#2563a8}
+
+/* ── Stat grid ── */
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.stat-item{background:#F8F7F6;border-radius:5px;padding:8px 10px;border-left:3px solid #2563a8}
+.stat-item.red{border-left-color:#D13438}.stat-item.gold{border-left-color:#D4A017}.stat-item.green{border-left-color:#107C10}
+.s-val{font-size:18px;font-weight:700;color:#252423}
+.s-lbl{font-size:9px;color:#797775;margin-top:2px;line-height:1.4}
+
+/* ── Callout ── */
+.callout{background:#FDE7E9;border:1px solid #F4B8BB;border-radius:6px;padding:10px 14px;display:flex;gap:10px;align-items:flex-start}
+.callout .icon{font-size:20px;flex-shrink:0}
+.c-title{font-size:11px;font-weight:700;color:#D13438}
+.c-body{font-size:10px;color:#605E5C;margin-top:3px;line-height:1.5}
+
+/* ── Footer ── */
+.footer{background:#1B3A6B;color:rgba(255,255,255,.5);text-align:center;padding:10px;font-size:10px;margin-top:4px}
+.footer span{color:#D4A017;font-weight:700}
+
+/* ── Score badge ── */
+.score-badge{display:inline-block;width:32px;height:22px;border-radius:4px;text-align:center;line-height:22px;font-size:11px;font-weight:700;color:#fff}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="top-bar">
+  <div>
+    <div class="logo">FLICK <span>●</span> E-Invoicing Lead Intelligence</div>
+    <div class="subtitle">Abu Dhabi Market Analysis — UAE FTA Mandate 2026–2027 | June 2026</div>
+  </div>
+  <div class="badge">⚡ 90% of UAE Businesses NOT Ready</div>
+</div>
+
+<!-- FILTER BAR -->
+<div class="filter-bar">
+  <label>SECTOR</label>
+  <select id="secF" onchange="applyFilter()">
+    <option value="all">All Sectors</option>
+    <option value="Trading">Trading</option>
+    <option value="Construction">Construction</option>
+    <option value="Logistics">Logistics</option>
+    <option value="Real Estate">Real Estate</option>
+    <option value="Professional">Professional Services</option>
+    <option value="Manufacturing">Manufacturing</option>
+  </select>
+  <label>PRIORITY</label>
+  <select id="priF" onchange="applyFilter()">
+    <option value="all">All Priorities</option>
+    <option value="urgent">🔴 Urgent</option>
+    <option value="high">🟠 High</option>
+    <option value="watch">🔵 Watch</option>
+  </select>
+  <label>PHASE</label>
+  <select id="phF" onchange="applyFilter()">
+    <option value="all">All Phases</option>
+    <option value="1">Phase 1 (Jan 2027)</option>
+    <option value="2">Phase 2 (Jul 2027)</option>
+    <option value="3">Phase 3 (Oct 2027)</option>
+  </select>
+  <div class="filter-info" id="fInfo">Showing 30 of 30 leads</div>
+</div>
+
+<!-- MAIN -->
+<div class="canvas">
+
+  <!-- KPIs -->
+  <div class="kpi-row">
+    <div class="kpi red"><div class="kpi-icon">⚠️</div><div class="kpi-lbl">Businesses Not Ready</div><div class="kpi-val">90%</div><div class="kpi-sub">of UAE businesses unequipped</div><div class="kpi-trend">↑ Massive greenfield opportunity</div></div>
+    <div class="kpi"><div class="kpi-icon">🏢</div><div class="kpi-lbl">Leads Identified</div><div class="kpi-val" id="kpiLeads">30</div><div class="kpi-sub">Abu Dhabi companies</div><div class="kpi-trend">↑ 16 scored 8–10 urgency</div></div>
+    <div class="kpi gold"><div class="kpi-icon">📅</div><div class="kpi-lbl">Phase 1 ASP Deadline</div><div class="kpi-val">Oct 30</div><div class="kpi-sub">2026 — AED 50M+ firms</div><div class="kpi-trend">⚡ 145 days remaining</div></div>
+    <div class="kpi red"><div class="kpi-icon">💸</div><div class="kpi-lbl">Monthly Fine</div><div class="kpi-val">AED 5K</div><div class="kpi-sub">+ AED 100 per invoice</div><div class="kpi-trend">↑ Strong ROI pitch driver</div></div>
+    <div class="kpi green"><div class="kpi-icon">💰</div><div class="kpi-lbl">SME Funding Pool</div><div class="kpi-val">AED 30B</div><div class="kpi-sub">EDB committed through 2025</div><div class="kpi-trend dn">↓ Budget available to spend</div></div>
+  </div>
+
+  <!-- ROW 2: bar chart + donut + timeline -->
+  <div class="row2">
+
+    <!-- Lead Score Bar Chart -->
+    <div class="card">
+      <div class="card-hdr"><h3>📊 Lead Score by Sector (Abu Dhabi)</h3><span class="sub">Average score 1–10 · E-Invoice Gap Analysis</span></div>
+      <div class="card-body">
+        <div class="bar-chart">
+          <div class="bar-row"><span class="bar-label">Trading & Distribution</span><div class="bar-track"><div class="bar-fill" style="width:90%;background:#D13438">9/10</div></div></div>
+          <div class="bar-row"><span class="bar-label">Construction</span><div class="bar-track"><div class="bar-fill" style="width:90%;background:#D13438">9/10</div></div></div>
+          <div class="bar-row"><span class="bar-label">Logistics & Freight</span><div class="bar-track"><div class="bar-fill" style="width:80%;background:#E87722">8/10</div></div></div>
+          <div class="bar-row"><span class="bar-label">Real Estate</span><div class="bar-track"><div class="bar-fill" style="width:80%;background:#E87722">8/10</div></div></div>
+          <div class="bar-row"><span class="bar-label">Professional Services</span><div class="bar-track"><div class="bar-fill" style="width:70%;background:#D4A017">7/10</div></div></div>
+          <div class="bar-row"><span class="bar-label">Manufacturing</span><div class="bar-track"><div class="bar-fill" style="width:70%;background:#D4A017">7/10</div></div></div>
+          <div class="bar-row"><span class="bar-label">Healthcare & Pharma</span><div class="bar-track"><div class="bar-fill" style="width:60%;background:#8B5CF6">6/10</div></div></div>
+          <div class="bar-row"><span class="bar-label">Hospitality & F&amp;B</span><div class="bar-track"><div class="bar-fill" style="width:60%;background:#8B5CF6">6/10</div></div></div>
+          <div class="bar-row"><span class="bar-label">Retail & E-Commerce</span><div class="bar-track"><div class="bar-fill" style="width:50%;background:#2563a8">5/10</div></div></div>
+          <div class="bar-row"><span class="bar-label">IT & Technology</span><div class="bar-track"><div class="bar-fill" style="width:40%;background:#9CA3AF">4/10</div></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Priority Donut (CSS conic-gradient) -->
+    <div class="card">
+      <div class="card-hdr"><h3>🎯 Lead Priority Mix</h3><span class="sub">30 identified leads</span></div>
+      <div class="card-body">
+        <div class="donut-wrap">
+          <!-- 10 urgent=33%, 13 high=43%, 5 med=17%, 2 watch=7% -->
+          <div style="position:relative;width:150px;height:150px">
+            <div style="width:150px;height:150px;border-radius:50%;background:conic-gradient(#D13438 0% 33%,#E87722 33% 76%,#D4A017 76% 93%,#2563a8 93% 100%);"></div>
+            <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:80px;height:80px;background:#fff;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;">
+              <div style="font-size:18px;font-weight:700;color:#252423">30</div>
+              <div style="font-size:9px;color:#797775">leads</div>
+            </div>
+          </div>
+          <div class="donut-legend">
+            <div class="dl-item"><div class="dl-dot" style="background:#D13438"></div>Urgent (9–10) · 10</div>
+            <div class="dl-item"><div class="dl-dot" style="background:#E87722"></div>High (7–8) · 13</div>
+            <div class="dl-item"><div class="dl-dot" style="background:#D4A017"></div>Medium (5–6) · 5</div>
+            <div class="dl-item"><div class="dl-dot" style="background:#2563a8"></div>Watch (≤5) · 2</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Timeline -->
+    <div class="card">
+      <div class="card-hdr"><h3>📅 FTA Mandate Timeline</h3><span class="sub">Critical deadlines 2026–2027</span></div>
+      <div class="card-body">
+        <div class="timeline">
+          <div class="tl-item">
+            <div class="tl-dot" style="background:#D4A017">P</div>
+            <div><div class="tl-phase">PILOT — Jul 1, 2026</div><div class="tl-date">⚡ ACTIVE NOW</div><div class="tl-desc">Selected large firms onboarding</div></div>
+          </div>
+          <div class="tl-connector"></div>
+          <div class="tl-item">
+            <div class="tl-dot" style="background:#D13438">1</div>
+            <div><div class="tl-phase">PHASE 1 — Jan 1, 2027</div><div class="tl-date">🔴 ASP deadline: Oct 30, 2026</div><div class="tl-desc">AED 50M+ revenue businesses</div></div>
+          </div>
+          <div class="tl-connector"></div>
+          <div class="tl-item">
+            <div class="tl-dot" style="background:#E87722">2</div>
+            <div><div class="tl-phase">PHASE 2 — Jul 1, 2027</div><div class="tl-date">🟠 ASP deadline: Mar 31, 2027</div><div class="tl-desc">All SMEs &lt; AED 50M</div></div>
+          </div>
+          <div class="tl-connector"></div>
+          <div class="tl-item">
+            <div class="tl-dot" style="background:#107C10">3</div>
+            <div><div class="tl-phase">PHASE 3 — Oct 1, 2027</div><div class="tl-date">🟢 ASP deadline: Mar 31, 2027</div><div class="tl-desc">Government & B2G entities</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ROW 3: sector table + right col -->
+  <div class="row3">
+
+    <!-- Sector readiness table -->
+    <div class="card">
+      <div class="card-hdr"><h3>🏭 Sector Readiness Analysis</h3><span class="sub">E-Invoice compliance % vs lead opportunity</span></div>
+      <div class="card-body" style="padding:0">
+        <table class="stbl">
+          <thead><tr><th>Sector</th><th>Est. SMEs</th><th>E-Invoice Ready</th><th>Lead Score</th><th>Priority</th></tr></thead>
+          <tbody>
+            <tr><td>Trading & Distribution</td><td>2,500+</td><td><div class="mini-bar-wrap"><div class="mini-bar" style="width:12px;background:#D13438"></div><span style="font-size:10px;color:#D13438;font-weight:700">5%</span></div></td><td><div class="mini-bar-wrap"><div class="mini-bar" style="width:90px;background:#D13438"></div><span style="font-weight:700;color:#D13438">9</span></div></td><td><span class="pill urgent">🔥 URGENT</span></td></tr>
+            <tr><td>Construction</td><td>1,800+</td><td><div class="mini-bar-wrap"><div class="mini-bar" style="width:15px;background:#D13438"></div><span style="font-size:10px;color:#D13438;font-weight:700">8%</span></div></td><td><div class="mini-bar-wrap"><div class="mini-bar" style="width:90px;background:#D13438"></div><span style="font-weight:700;color:#D13438">9</span></div></td><td><span class="pill urgent">🔥 URGENT</span></td></tr>
+            <tr><td>Logistics & Freight</td><td>900+</td><td><div class="mini-bar-wrap"><div class="mini-bar" style="width:18px;background:#E87722"></div><span style="font-size:10px;color:#E87722;font-weight:700">10%</span></div></td><td><div class="mini-bar-wrap"><div class="mini-bar" style="width:80px;background:#E87722"></div><span style="font-weight:700;color:#E87722">8</span></div></td><td><span class="pill high">⚡ HIGH</span></td></tr>
+            <tr><td>Real Estate</td><td>1,200+</td><td><div class="mini-bar-wrap"><div class="mini-bar" style="width:8px;background:#D13438"></div><span style="font-size:10px;color:#D13438;font-weight:700">4%</span></div></td><td><div class="mini-bar-wrap"><div class="mini-bar" style="width:80px;background:#E87722"></div><span style="font-weight:700;color:#E87722">8</span></div></td><td><span class="pill high">⚡ HIGH</span></td></tr>
+            <tr><td>Professional Services</td><td>3,000+</td><td><div class="mini-bar-wrap"><div class="mini-bar" style="width:12px;background:#E87722"></div><span style="font-size:10px;color:#E87722;font-weight:700">6%</span></div></td><td><div class="mini-bar-wrap"><div class="mini-bar" style="width:70px;background:#D4A017"></div><span style="font-weight:700;color:#8A6800">7</span></div></td><td><span class="pill med">✅ MEDIUM</span></td></tr>
+            <tr><td>Manufacturing</td><td>600+</td><td><div class="mini-bar-wrap"><div class="mini-bar" style="width:35px;background:#E87722"></div><span style="font-size:10px;color:#E87722;font-weight:700">20%</span></div></td><td><div class="mini-bar-wrap"><div class="mini-bar" style="width:70px;background:#D4A017"></div><span style="font-weight:700;color:#8A6800">7</span></div></td><td><span class="pill med">✅ MEDIUM</span></td></tr>
+            <tr><td>Healthcare & Pharma</td><td>800+</td><td><div class="mini-bar-wrap"><div class="mini-bar" style="width:25px;background:#E87722"></div><span style="font-size:10px;color:#E87722;font-weight:700">15%</span></div></td><td><div class="mini-bar-wrap"><div class="mini-bar" style="width:60px;background:#8B5CF6"></div><span style="font-weight:700;color:#8B5CF6">6</span></div></td><td><span class="pill med">📌 MEDIUM</span></td></tr>
+            <tr><td>Retail & E-Commerce</td><td>3,500+</td><td><div class="mini-bar-wrap"><div class="mini-bar" style="width:6px;background:#D13438"></div><span style="font-size:10px;color:#D13438;font-weight:700">2%</span></div></td><td><div class="mini-bar-wrap"><div class="mini-bar" style="width:50px;background:#2563a8"></div><span style="font-weight:700;color:#2563a8">5</span></div></td><td><span class="pill watch">🔵 WATCH</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Right col: system chart + risk -->
+    <div class="col2">
+
+      <div class="card">
+        <div class="card-hdr"><h3>🖥️ Current Invoicing Systems in Market</h3><span class="sub">Abu Dhabi SME landscape</span></div>
+        <div class="card-body">
+          <div class="hbar-chart">
+            <div class="hbar-row"><span class="hbar-label">Manual / Excel / PDF</span><div class="hbar-track"><div class="hbar-fill" style="width:84%;background:#D13438">38%</div></div><span class="hbar-pct" style="color:#D13438">38%</span></div>
+            <div class="hbar-row"><span class="hbar-label">Tally Prime</span><div class="hbar-track"><div class="hbar-fill" style="width:49%;background:#E87722">22%</div></div><span class="hbar-pct" style="color:#E87722">22%</span></div>
+            <div class="hbar-row"><span class="hbar-label">QuickBooks</span><div class="hbar-track"><div class="hbar-fill" style="width:40%;background:#D4A017">18%</div></div><span class="hbar-pct" style="color:#8A6800">18%</span></div>
+            <div class="hbar-row"><span class="hbar-label">Zoho Books</span><div class="hbar-track"><div class="hbar-fill" style="width:27%;background:#8B5CF6">12%</div></div><span class="hbar-pct" style="color:#8B5CF6">12%</span></div>
+            <div class="hbar-row"><span class="hbar-label">SAP / Oracle (partial)</span><div class="hbar-track"><div class="hbar-fill" style="width:18%;background:#2563a8">8%</div></div><span class="hbar-pct" style="color:#2563a8">8%</span></div>
+            <div class="hbar-row"><span class="hbar-label">Full ERP + ASP</span><div class="hbar-track"><div class="hbar-fill" style="width:5%;background:#107C10">2%</div></div><span class="hbar-pct" style="color:#107C10">2%</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-hdr"><h3>⚠️ Non-Compliance Risk & Urgency</h3></div>
+        <div class="card-body" style="display:flex;flex-direction:column;gap:8px">
+          <div class="callout">
+            <div class="icon">🚨</div>
+            <div><div class="c-title">AED 5,000/month system fine</div><div class="c-body">Businesses not connected to an FTA-approved ASP by deadline face a monthly AED 5,000 penalty. <strong>Phase 1 deadline: Oct 30, 2026.</strong></div></div>
+          </div>
+          <div class="stat-grid">
+            <div class="stat-item red"><div class="s-val">82%</div><div class="s-lbl">UAE firms are micro-businesses (&lt;AED 3M) — all in scope</div></div>
+            <div class="stat-item gold"><div class="s-val">72%</div><div class="s-lbl">SMEs using cloud accounting — need ASP upgrade</div></div>
+            <div class="stat-item green"><div class="s-val">AED 100</div><div class="s-lbl">Per-invoice fine for improper transmission</div></div>
+            <div class="stat-item"><div class="s-val">XML</div><div class="s-lbl">Only PINT-AE XML via ASP qualifies — PDF/Word invalid</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ROW 4: lead table + pipeline + GDP -->
+  <div class="row4">
+
+    <!-- Lead table -->
+    <div class="card">
+      <div class="card-hdr"><h3>🏆 Top Priority Leads — Abu Dhabi</h3><span class="sub" id="ltblSub">30 leads · Sorted by score</span></div>
+      <div class="card-body" style="padding:0;overflow-x:auto;max-height:380px;overflow-y:auto">
+        <table class="ltbl">
+          <thead><tr><th>#</th><th>Company</th><th>Sector</th><th>System</th><th>Score</th><th>Priority</th><th>Phase</th><th>Pitch Angle</th></tr></thead>
+          <tbody id="ltbl"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Right col: pipeline + GDP -->
+    <div class="col2">
+
+      <div class="card">
+        <div class="card-hdr"><h3>📈 Outreach Pipeline Funnel</h3><span class="sub">Projected conversion</span></div>
+        <div class="card-body">
+          <div class="hbar-chart">
+            <div class="hbar-row"><span class="hbar-label" style="width:100px">Identified</span><div class="hbar-track"><div class="hbar-fill" style="width:100%;background:#2563a8">30</div></div><span class="hbar-pct">30</span></div>
+            <div class="hbar-row"><span class="hbar-label" style="width:100px">Contacted</span><div class="hbar-track"><div class="hbar-fill" style="width:67%;background:#D4A017">20</div></div><span class="hbar-pct">20</span></div>
+            <div class="hbar-row"><span class="hbar-label" style="width:100px">Demo Booked</span><div class="hbar-track"><div class="hbar-fill" style="width:40%;background:#E87722">12</div></div><span class="hbar-pct">12</span></div>
+            <div class="hbar-row"><span class="hbar-label" style="width:100px">Proposal Sent</span><div class="hbar-track"><div class="hbar-fill" style="width:23%;background:#D13438">7</div></div><span class="hbar-pct">7</span></div>
+            <div class="hbar-row"><span class="hbar-label" style="width:100px">Closed Won</span><div class="hbar-track"><div class="hbar-fill" style="width:13%;background:#107C10">4</div></div><span class="hbar-pct">4</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-hdr"><h3>💼 Abu Dhabi GDP Growth by Sector</h3><span class="sub">Q2 2025 YoY — economic activity</span></div>
+        <div class="card-body">
+          <div class="bar-chart">
+            <div class="bar-row"><span class="bar-label" style="width:150px">Finance & Insurance</span><div class="bar-track"><div class="bar-fill" style="width:100%;background:#107C10">+10.3%</div></div></div>
+            <div class="bar-row"><span class="bar-label" style="width:150px">Professional Services</span><div class="bar-track"><div class="bar-fill" style="width:97%;background:#107C10">+10.0%</div></div></div>
+            <div class="bar-row"><span class="bar-label" style="width:150px">Construction</span><div class="bar-track"><div class="bar-fill" style="width:94%;background:#E87722">+9.7%</div></div></div>
+            <div class="bar-row"><span class="bar-label" style="width:150px">Logistics</span><div class="bar-track"><div class="bar-fill" style="width:63%;background:#D4A017">+6.5%</div></div></div>
+            <div class="bar-row"><span class="bar-label" style="width:150px">ICT / Technology</span><div class="bar-track"><div class="bar-fill" style="width:58%;background:#2563a8">+6.0%</div></div></div>
+            <div class="bar-row"><span class="bar-label" style="width:150px">Manufacturing</span><div class="bar-track"><div class="bar-fill" style="width:30%;background:#8B5CF6">+3.1%</div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="footer">
+  <span>FLICK E-INVOICING</span> · Abu Dhabi Market Intelligence · June 2026 &nbsp;|&nbsp;
+  Sources: UAE FTA · Deloitte · Gulf News · Avalara · ADDED · Abu Dhabi Statistics Centre · Industry Reports
+</div>
+
+<script>
+const leads = [
+  {c:"Al Masaood Group",          s:"Trading",       sys:"ERP (partial)",     sc:9, p:"urgent", ph:1, pitch:"Phase 1 — ASP by Oct 2026"},
+  {c:"Ghobash Trading",           s:"Trading",       sys:"Manual/Excel",      sc:9, p:"urgent", ph:1, pitch:"Fine risk urgency pitch"},
+  {c:"Al Fara'a Group",           s:"Construction",  sys:"Semi-manual",       sc:9, p:"urgent", ph:1, pitch:"Government project compliance"},
+  {c:"Trojan General Contracting",s:"Construction",  sys:"Manual PDF",        sc:9, p:"urgent", ph:1, pitch:"Urgency: Jan 2027 deadline"},
+  {c:"Imkan Properties",          s:"Real Estate",   sys:"Manual/Excel",      sc:9, p:"urgent", ph:1, pitch:"Fine risk + RERA compliance"},
+  {c:"Seven Seas Shipping",       s:"Logistics",     sys:"Manual/Excel",      sc:8, p:"urgent", ph:2, pitch:"SME urgency pitch"},
+  {c:"Al Maha Logistics",         s:"Logistics",     sys:"QuickBooks",        sc:8, p:"urgent", ph:2, pitch:"QB + ASP integration"},
+  {c:"Bloom Holding",             s:"Real Estate",   sys:"Semi-ERP",          sc:8, p:"urgent", ph:1, pitch:"Compliance + tenant invoicing"},
+  {c:"Eagle Hills",               s:"Real Estate",   sys:"Manual invoicing",  sc:8, p:"urgent", ph:1, pitch:"B2B contractor invoices"},
+  {c:"Al Qudra Real Estate",      s:"Real Estate",   sys:"Excel/Zoho",        sc:8, p:"urgent", ph:2, pitch:"SME real estate upgrade"},
+  {c:"Gulf Precast Concrete",     s:"Manufacturing", sys:"Manual/ERP mix",    sc:8, p:"urgent", ph:1, pitch:"B2G construction supplier"},
+  {c:"Bin Hamoodah Trading",      s:"Trading",       sys:"SAP (partial)",     sc:8, p:"urgent", ph:1, pitch:"SAP → ASP connector"},
+  {c:"Dalu Trading LLC",          s:"Trading",       sys:"Tally/QB",          sc:8, p:"urgent", ph:2, pitch:"SME digital upgrade pitch"},
+  {c:"Al Ain Distribution Co.",   s:"Trading",       sys:"Tally",             sc:8, p:"urgent", ph:1, pitch:"Multi-emirate compliance"},
+  {c:"Agility UAE",               s:"Logistics",     sys:"WMS + partial ERP", sc:7, p:"high",   ph:1, pitch:"Integration for freight docs"},
+  {c:"Al Habtoor Engineering",    s:"Construction",  sys:"ERP (partial)",     sc:7, p:"high",   ph:1, pitch:"ERP → ASP upgrade"},
+  {c:"ALEC Energy",               s:"Construction",  sys:"Oracle Primavera",  sc:7, p:"high",   ph:1, pitch:"ASP gap-fill pitch"},
+  {c:"Arabtec Construction",      s:"Construction",  sys:"SAP",               sc:7, p:"high",   ph:1, pitch:"SAP ASP integration"},
+  {c:"BDO UAE Abu Dhabi",         s:"Professional",  sys:"Zoho Books",        sc:7, p:"high",   ph:2, pitch:"Zoho + Flick integration"},
+  {c:"Crowe UAE",                 s:"Professional",  sys:"QuickBooks",        sc:7, p:"high",   ph:2, pitch:"QB + Peppol integration"},
+  {c:"Al Tamimi & Company",       s:"Professional",  sys:"Manual PDF",        sc:7, p:"high",   ph:1, pitch:"Law firm billing upgrade"},
+  {c:"National Food Products",    s:"Manufacturing", sys:"ERP (old)",         sc:7, p:"high",   ph:1, pitch:"Legacy ERP upgrade pitch"},
+  {c:"Agthia Group",              s:"Manufacturing", sys:"SAP",               sc:6, p:"high",   ph:1, pitch:"Phase 1 ASP appointment"},
+  {c:"Emirates Steel (EMSTEEL)",  s:"Manufacturing", sys:"SAP",               sc:6, p:"high",   ph:1, pitch:"SAP ASP integration"},
+  {c:"Abu Dhabi Ports",           s:"Logistics",     sys:"SAP",               sc:6, p:"high",   ph:3, pitch:"Peppol-certified ASP"},
+  {c:"Aldar Properties",          s:"Real Estate",   sys:"SAP/Oracle",        sc:6, p:"high",   ph:1, pitch:"Enterprise ASP contract"},
+  {c:"Aramex Abu Dhabi",          s:"Logistics",     sys:"ERP",               sc:6, p:"watch",  ph:1, pitch:"ASP appointment needed"},
+  {c:"Mott MacDonald UAE",        s:"Professional",  sys:"Oracle Financials",  sc:6, p:"watch",  ph:1, pitch:"Oracle ASP connector"},
+  {c:"AECOM Middle East",         s:"Professional",  sys:"SAP",               sc:6, p:"watch",  ph:1, pitch:"SAP Peppol ASP gap"},
+  {c:"ADNOC Distribution",        s:"Manufacturing", sys:"SAP S/4HANA",       sc:5, p:"watch",  ph:1, pitch:"Large ASP enterprise deal"},
+];
+
+const phaseLabel = {1:"Ph1 · Jan 2027", 2:"Ph2 · Jul 2027", 3:"Ph3 · Oct 2027"};
+const pillMap    = {urgent:"urgent", high:"high", med:"med", watch:"watch"};
+const pillText   = {urgent:"🔴 Urgent", high:"🟠 High", med:"🟡 Medium", watch:"🔵 Watch"};
+const scoreColor = sc => sc>=9?"#D13438":sc>=7?"#E87722":sc>=5?"#8A6800":"#2563a8";
+
+function renderTable(data) {
+  const tb = document.getElementById("ltbl");
+  const sb = document.getElementById("ltblSub");
+  sb.textContent = data.length+" leads · Sorted by score";
+  document.getElementById("kpiLeads").textContent = data.length;
+  data.sort((a,b)=>b.sc-a.sc);
+  tb.innerHTML = data.map((l,i)=>`
+    <tr>
+      <td style="color:#797775;font-size:10px">${i+1}</td>
+      <td style="font-weight:600">${l.c}</td>
+      <td style="color:#605E5C">${l.s}</td>
+      <td style="color:#797775;font-size:10px">${l.sys}</td>
+      <td><span style="background:${scoreColor(l.sc)};color:#fff;padding:2px 7px;border-radius:4px;font-weight:700;font-size:11px">${l.sc}/10</span></td>
+      <td><span class="pill ${pillMap[l.p]}">${pillText[l.p]}</span></td>
+      <td style="font-size:10px;color:#605E5C">${phaseLabel[l.ph]}</td>
+      <td style="font-size:10px;color:#605E5C">${l.pitch}</td>
+    </tr>`).join("");
+  document.getElementById("fInfo").textContent = `Showing ${data.length} of ${leads.length} leads`;
+}
+
+function applyFilter() {
+  const sec = document.getElementById("secF").value;
+  const pri = document.getElementById("priF").value;
+  const ph  = document.getElementById("phF").value;
+  const filtered = leads.filter(l=>
+    (sec==="all"||l.s.includes(sec)) &&
+    (pri==="all"||l.p===pri) &&
+    (ph ==="all"||l.ph===parseInt(ph))
+  );
+  renderTable(filtered);
+}
+
+renderTable([...leads]);
+</script>
+</body>
+</html>
