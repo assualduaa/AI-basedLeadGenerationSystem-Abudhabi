@@ -258,4 +258,4 @@ By focusing on VAT-registered SMEs with low digital invoicing visibility, this p
 **Built for:** Flick e-Invoicing Lead Generation  
 **Data Region:** Abu Dhabi, UAE  
 **Compliance Framework:** UAE FTA e-Invoicing Mandate (PINT-AE / Peppol)  
-**Contact:** fahdabdulla2001@gmail.com
+**Contact:** assumay@gmail.com
