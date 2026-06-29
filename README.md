@@ -1,6 +1,6 @@
 # AI-basedLeadGenerationSystem-Abudhabi
 
-# Flick e-Invoicing — Abu Dhabi B2B Lead Generation Pipeline
+# e-Invoicing System — Abu Dhabi B2B Lead Generation Pipeline
 
 > A structured, compliance-aware lead research system for identifying Abu Dhabi businesses likely to require UAE e-invoicing solutions from Flick.
 
@@ -10,7 +10,7 @@
 
 1. [Introduction](#introduction)
 2. [Background: UAE e-Invoicing Mandate](#background-uae-e-invoicing-mandate)
-3. [What is Flick e-Invoicing?](#what-is-flick-e-invoicing)
+3. [What is e-Invoicing?](#what-is-e-invoicing)
 4. [Project Goal](#project-goal)
 5. [Target Audience (Lead Profile)](#target-audience-lead-profile)
 6. [Research Methodology](#research-methodology)
@@ -33,7 +33,7 @@ This project is a **B2B lead generation and data research pipeline** built to id
 
 - Are VAT-registered (or likely to be)
 - Are not visibly using a compliant e-invoicing system
-- Would benefit from onboarding to **Flick** — an FTA-accredited e-invoicing Accredited Service Provider (ASP)
+- Would benefit from onboarding to  — an FTA-accredited e-invoicing Accredited Service Provider (ASP)
 
 ---
 
